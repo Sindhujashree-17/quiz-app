@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Quiz Generator</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; }
+        .question { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🧠 AI Quiz Generator</h1>
+    <form id="quizForm">
+        <input type="text" id="topic" name="topic" placeholder="Enter a topic" required />
+        <button type="submit">Generate Quiz</button>
+    </form>
+    <div id="quiz"></div>
+
+    <script>
+        document.getElementById('quizForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const topic = document.getElementById('topic').value;
+            const res = await fetch('/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ topic })
+            });
+            const data = await res.json();
+            const quizDiv = document.getElementById('quiz');
+            quizDiv.innerHTML = '';
+
+            if (data.length === 0) {
+                quizDiv.innerHTML = "<p>❌ No questions generated. Try again.</p>";
+                return;
+            }
+
+            data.forEach((q, index) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'question';
+                qDiv.innerHTML = `
+                    <h3>Q${index + 1}: ${q.question}</h3>
+                    <ul>
+                        ${q.options.map(opt => `<li>${opt}</li>`).join('')}
+                    </ul>
+                    <p><strong>Answer:</strong> ${q.answer}</p>
+                `;
+                quizDiv.appendChild(qDiv);
+            });
+        });
+    </script>
+</body>
+</html>
