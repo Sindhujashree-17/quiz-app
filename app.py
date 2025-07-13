@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 
 # ✅ Set your Gemini API key
-genai.configure(api_key="AIzaSyBvA3DLZVADphQrPM5_ZTkaJqAdVXfG6M4")  # 🔑 Replace with your Gemini API key
+genai.configure(api_key="")  # 🔑 Replace with your Gemini API key
 
 
 @app.route('/')
