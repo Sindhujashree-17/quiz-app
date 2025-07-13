@@ -3,9 +3,20 @@
 <head>
     <title>AI Quiz Generator</title>
     <style>
-        body { font-family: Arial; padding: 20px; }
-        input, button { padding: 10px; margin: 5px 0; width: 100%; }
-        .question { margin-bottom: 20px; }
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f7f7fa; }
+        h1 { text-align: center; }
+        #quizForm, #quiz { max-width: 600px; margin: 0 auto; }
+        input[type="text"] { padding: 10px; margin: 5px 0; width: 100%; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 10px; margin: 10px 0; width: 100%; border-radius: 5px; border: none; background: #007bff; color: #fff; font-size: 16px; cursor: pointer; }
+        button:disabled { background: #aaa; }
+        .question { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 16px; margin-bottom: 20px; }
+        .option-label { display: block; padding: 6px 10px; border-radius: 5px; margin-bottom: 5px; cursor: pointer; transition: background 0.2s; }
+        .option-label.correct { background: #d4edda; color: #155724; }
+        .option-label.wrong { background: #f8d7da; color: #721c24; }
+        .option-label.selected { border: 2px solid #007bff; }
+        .correct-answer { font-size: 13px; color: #155724; margin-left: 10px; }
+        .wrong-answer { font-size: 13px; color: #721c24; margin-left: 10px; }
+        .score { font-size: 20px; text-align: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -34,18 +45,57 @@
                 return;
             }
 
+            // Render questions with radio buttons
             data.forEach((q, index) => {
                 const qDiv = document.createElement('div');
                 qDiv.className = 'question';
                 qDiv.innerHTML = `
                     <h3>Q${index + 1}: ${q.question}</h3>
-                    <ul>
-                        ${q.options.map(opt => `<li>${opt}</li>`).join('')}
-                    </ul>
-                    <p><strong>Answer:</strong> ${q.answer}</p>
+                    <div id="options-q${index}">
+                        ${q.options.map((opt, i) => `
+                            <label class="option-label" id="label-q${index}-opt${i}">
+                                <input type="radio" name="q${index}" value="${opt}" style="margin-right:8px;">
+                                ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
                 `;
                 quizDiv.appendChild(qDiv);
             });
+
+            // Add submit button
+            const submitBtn = document.createElement('button');
+            submitBtn.textContent = "Submit Answers";
+            submitBtn.type = "button";
+            submitBtn.onclick = function() {
+                let score = 0;
+                data.forEach((q, index) => {
+                    const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                    let correctIdx = q.options.indexOf(q.answer);
+                    let selectedIdx = -1;
+                    if (selected) {
+                        selectedIdx = q.options.indexOf(selected.value);
+                        if (selected.value === q.answer) {
+                            score++;
+                            document.getElementById(`label-q${index}-opt${selectedIdx}`).classList.add('correct', 'selected');
+                        } else {
+                            document.getElementById(`label-q${index}-opt${selectedIdx}`).classList.add('wrong', 'selected');
+                            document.getElementById(`label-q${index}-opt${selectedIdx}`).innerHTML += `<span class="wrong-answer">✗</span>`;
+                            document.getElementById(`label-q${index}-opt${correctIdx}`).classList.add('correct');
+                            document.getElementById(`label-q${index}-opt${correctIdx}`).innerHTML += `<span class="correct-answer">✓</span>`;
+                        }
+                    } else {
+                        // If not answered, just highlight the correct one
+                        document.getElementById(`label-q${index}-opt${correctIdx}`).classList.add('correct');
+                        document.getElementById(`label-q${index}-opt${correctIdx}`).innerHTML += `<span class="correct-answer">✓</span>`;
+                    }
+                    // Disable all options after submission
+                    document.querySelectorAll(`input[name="q${index}"]`).forEach(inp => inp.disabled = true);
+                });
+                quizDiv.insertAdjacentHTML('afterbegin', `<div class="score"><strong>Your Score: ${score} / ${data.length}</strong></div>`);
+                submitBtn.disabled = true;
+            };
+            quizDiv.appendChild(submitBtn);
         });
     </script>
 </body>

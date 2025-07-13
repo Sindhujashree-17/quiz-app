@@ -7,7 +7,8 @@ import os
 app = Flask(__name__)
 
 # ✅ Set your Gemini API key
-genai.configure(api_key="AIzaSyDPJoXppCcIzrg5uUTqMfZZIW5oIpfs3aI")  # 🔑 Replace with your Gemini API key
+genai.configure(api_key="AIzaSyBvA3DLZVADphQrPM5_ZTkaJqAdVXfG6M4")  # 🔑 Replace with your Gemini API key
+
 
 @app.route('/')
 def home():
@@ -35,11 +36,14 @@ def generate():
     """
 
     try:
-        model = genai.GenerativeModel(model_name="models/gemini-pro")  # ✅ Correct model name and path
+        # filepath: /home/kalam/Documents/quiz-app/app.py
+        #print([m.name for m in genai.list_models()])
+        
+        model = genai.GenerativeModel(model_name="models/gemini-1.5-pro")  # ✅ Correct model name and path
         response = model.generate_content(prompt)
         response_text = response.text.strip()
 
-        print("\n🔍 Gemini raw response:\n", response_text)
+        # print("\n🔍 Gemini raw response:\n", response_text)
 
         # Extract valid JSON from Gemini response
         try:
