@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Quiz App</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7fa; }
+        .login-container {
+            max-width: 350px;
+            margin: 80px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #0001;
+            padding: 32px 24px;
+        }
+        h2 { text-align: center; margin-bottom: 24px; }
+        input[type="text"], input[type="password"] {
+            width: 100%; padding: 10px; margin-bottom: 16px;
+            border-radius: 5px; border: 1px solid #ccc;
+        }
+        button {
+            width: 100%; padding: 10px; border-radius: 5px;
+            border: none; background: #007bff; color: #fff;
+            font-size: 16px; cursor: pointer;
+        }
+        .forgot {
+            display: block; text-align: right; margin-top: 8px;
+            color: #007bff; text-decoration: none; font-size: 14px;
+        }
+        .forgot:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form method="POST" action="/login">
+            <input type="text" name="username" placeholder="Username" required />
+            <input type="password" name="password" placeholder="Password" required />
+            <button type="submit">Login</button>
+            <a href="#" class="forgot">Forgot password?</a>
+        </form>
+    </div>
+</body>
+</html>
