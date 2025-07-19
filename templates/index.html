@@ -2,27 +2,74 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Quiz App</title>
+    <title>🧠 AI Quiz Generator</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f7f7fa; }
-        h1 { text-align: center; }
-        #quizForm, #quiz { max-width: 600px; margin: 0 auto; }
-        input[type="text"] { padding: 10px; margin: 5px 0; width: 100%; border-radius: 5px; border: 1px solid #ccc; }
-        button { padding: 10px; margin: 10px 0; width: 100%; border-radius: 5px; border: none; background: #007bff; color: #fff; font-size: 16px; cursor: pointer; }
-        button:disabled { background: #aaa; }
-        .question { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 16px; margin-bottom: 20px; }
-        .option-label { display: block; padding: 6px 10px; border-radius: 5px; margin-bottom: 5px; cursor: pointer; transition: background 0.2s; }
-        .option-label.correct { background: #d4edda; color: #155724; }
-        .option-label.wrong { background: #f8d7da; color: #721c24; }
-        .option-label.selected { border: 2px solid #007bff; }
-        .score { font-size: 20px; text-align: center; margin-bottom: 10px; }
-        #timer { text-align: center; font-size: 18px; color: red; }
-        #scoreboard { margin-top: 30px; }
+        body {
+            background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 60px auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px #0003;
+            padding: 40px 32px 32px 32px;
+            backdrop-filter: blur(2px);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .header .icon {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: #222;
+        }
+        .mode-select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            border: 1px solid #d0d0d0;
+            font-size: 1rem;
+        }
+        .topic-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            border: 1px solid #d0d0d0;
+            font-size: 1rem;
+        }
+        .generate-btn {
+            width: 100%;
+            padding: 14px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .generate-btn:hover {
+            background: #0056b3;
+        }
         .spinner {
             display: none;
-            margin: 20px auto;
+            margin: 24px auto;
             border: 8px solid #f3f3f3;
-            border-top: 8px solid #3498db;
+            border-top: 8px solid #007bff;
             border-radius: 50%;
             width: 60px;
             height: 60px;
@@ -32,40 +79,129 @@
             0% { transform: rotate(0deg);}
             100% { transform: rotate(360deg);}
         }
+        #quiz, #scoreboard {
+            margin-top: 32px;
+        }
+        .score {
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .question {
+            background: linear-gradient(90deg, #e0c3fc 0%, #8ec5fc 100%);
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px #007bff22;
+        }
+        .option-label {
+            display: block;
+            margin-bottom: 10px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        .option-label input[type="radio"] {
+            margin-right: 8px;
+        }
+        .option-label.correct {
+            background: #d4edda;
+            color: #155724;
+            font-weight: bold;
+        }
+        .option-label.wrong {
+            background: #f8d7da;
+            color: #721c24;
+            font-weight: bold;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 18px;
+        }
+        .btn {
+            padding: 10px 24px;
+            border-radius: 6px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #495057;
+        }
+        .btn-success {
+            background: #28a745;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
         .scoreboard-table {
-            margin-top: 30px;
-            border-collapse: collapse;
             width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+            box-shadow: 0 2px 8px #0001;
+            border-radius: 8px;
+            overflow: hidden;
         }
         .scoreboard-table th, .scoreboard-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            text-align: center;
         }
         .scoreboard-table th {
-            background-color: #f2f2f2;
+            background: #007bff;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+        .scoreboard-table tr:nth-child(even) {
+            background: #f1f7ff;
         }
     </style>
 </head>
 <body>
-    <h1>🧠 AI Quiz Generator</h1>
-
-    <form id="quizForm">
-        <input type="text" id="topic" name="topic" placeholder="Enter a topic" required />
-        <button type="submit">Generate Quiz</button>
-    </form>
-
-    <div class="spinner" id="spinner"></div>
-    <div id="timer" style="display:none;">⏳</div>
-    <div id="quiz"></div>
-    <div id="scoreboard"></div>
-
+    <div class="container">
+        <div class="header">
+            <div class="icon">🧠</div>
+            <h1>AI Quiz Generator</h1>
+        </div>
+        <form id="quizForm">
+            <select id="mode" name="mode" class="mode-select">
+                <option value="easy">Easy</option>
+                <option value="moderate">Moderate</option>
+                <option value="difficult">Difficult</option>
+            </select>
+            <input type="text" id="topic" name="topic" class="topic-input" placeholder="Enter a topic" required />
+            <button type="submit" class="generate-btn">Generate Quiz</button>
+        </form>
+        <div class="spinner" id="spinner"></div>
+        <div id="quiz"></div>
+        <div id="scoreboard"></div>
+        <div id="timer" style="text-align:center; font-size:1.1rem; margin-top:18px;"></div>
+    </div>
     <script>
 let questions = [];
+let userAnswers = [];
 let current = 0;
 let score = 0;
 let startTime = 0;
 let countdown;
-let userAnswers = [];
 
 function startTimer(duration) {
     let timeLeft = duration;
@@ -92,10 +228,11 @@ document.getElementById('quizForm').addEventListener('submit', async function(e)
     showSpinner(true);
 
     const topic = document.getElementById('topic').value;
+    const mode = document.getElementById('mode').value;
     const res = await fetch('/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ topic })
+        body: new URLSearchParams({ topic, mode })
     });
 
     questions = await res.json();
@@ -120,33 +257,66 @@ function showQuestion() {
         <form id="answerForm">
             ${q.options.map((opt, i) => `
                 <label class="option-label">
-                    <input type="radio" name="answer" value="${opt}" required>
+                    <input type="radio" name="answer" value="${opt}" ${userAnswers[current] === opt ? 'checked' : ''}>
                     ${opt}
                 </label>
             `).join('')}
-            <button type="submit">${current < questions.length - 1 ? 'Next' : 'Submit'}</button>
+            <div style="margin-top:16px;">
+                ${current > 0 ? '<button type="button" id="prevBtn" class="btn btn-secondary">Previous</button>' : ''}
+                ${current < questions.length - 1 ? '<button type="button" id="nextBtn" class="btn btn-primary" disabled>Next</button>' : '<button type="submit" class="btn btn-success" disabled>Submit</button>'}
+            </div>
         </form>
     </div>`;
     document.getElementById('quiz').innerHTML = html;
 
-    document.getElementById('answerForm').onsubmit = function(e) {
-        e.preventDefault();
-        const selected = document.querySelector('input[name="answer"]:checked');
-        userAnswers[current] = selected ? selected.value : null;
-        if (selected && selected.value === questions[current].answer) score++;
-        current++;
-        if (current < questions.length) {
+    // Enable Next/Submit only when an answer is selected
+    const answerInputs = document.querySelectorAll('input[name="answer"]');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.querySelector('button[type="submit"]');
+
+    answerInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            if (nextBtn) nextBtn.disabled = false;
+            if (submitBtn) submitBtn.disabled = false;
+        });
+    });
+
+    if (current > 0) {
+        document.getElementById('prevBtn').onclick = function() {
+            const selected = document.querySelector('input[name="answer"]:checked');
+            userAnswers[current] = selected ? selected.value : null;
+            current--;
             showQuestion();
-        } else {
+        };
+    }
+    if (current < questions.length - 1) {
+        if (nextBtn) {
+            nextBtn.onclick = function() {
+                const selected = document.querySelector('input[name="answer"]:checked');
+                userAnswers[current] = selected ? selected.value : null;
+                current++;
+                showQuestion();
+            };
+        }
+    } else if (submitBtn) {
+        document.getElementById('answerForm').onsubmit = function(e) {
+            e.preventDefault();
+            const selected = document.querySelector('input[name="answer"]:checked');
+            userAnswers[current] = selected ? selected.value : null;
             clearInterval(countdown);
             submitQuiz();
-        }
-    };
+        };
+    }
 }
 
 function submitQuiz() {
+    score = 0;
+    questions.forEach((q, idx) => { 
+        if (userAnswers[idx] === q.answer) score++;
+    });
     const topic = document.getElementById('topic').value;
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+
     let feedbackMessage = "";
     if (score === questions.length) {
         feedbackMessage = "🎉 Excellent! You got all correct!";
@@ -158,13 +328,10 @@ function submitQuiz() {
         feedbackMessage = "😕 Don't worry. Try again!";
     }
 
-    // Review answers with colored ticks/crosses
-    let reviewHtml = `
-        <div class="score"><strong>Your Score: ${score} / ${questions.length}</strong></div>
+    let reviewHtml = `<div class="score"><strong>Your Score: ${score} / ${questions.length}</strong></div>
         <div class="score">${feedbackMessage}</div>
         <h3>Review Answers</h3>
-        <div>
-    `;
+        <div>`;
     questions.forEach((q, idx) => {
         const userAns = userAnswers[idx];
         const isCorrect = userAns === q.answer;
@@ -188,16 +355,26 @@ function submitQuiz() {
             <br><span style="color:${isCorrect ? '#28a745' : '#dc3545'};">Your answer: ${userAns ? userAns : '<em>Not answered</em>'}</span>
         </div>`;
     });
-    reviewHtml += `</div>`;
+    reviewHtml += `</div>
+        <button id="retryBtn" style="margin-top:20px; background:#007bff; color:#fff;">Retry Quiz</button>
+        <button id="viewScoreboardBtn" style="margin-top:20px; background:#28a745;">View Scoreboard</button>`;
+
     document.getElementById('quiz').innerHTML = reviewHtml;
 
     fetch('/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topic, score, time_taken: timeTaken })
-    }).then(() => {
-        showScoreboard();
     });
+
+    document.getElementById('retryBtn').onclick = function() {
+        userAnswers = [];
+        current = 0;
+        score = 0;
+        startTime = Date.now();
+        showQuestion();
+    };
+    document.getElementById('viewScoreboardBtn').onclick = showScoreboard;
 }
 
 async function showScoreboard() {
