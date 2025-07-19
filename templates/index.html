@@ -34,36 +34,52 @@
             margin: 0;
             color: #222;
         }
-        .mode-select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 18px;
+        .glass-form {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: rgba(255,255,255,0.18);
+            border-radius: 14px;
+            box-shadow: 0 4px 24px #0002;
+            padding: 12px 18px;
+            backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(255,255,255,0.25);
+            margin-bottom: 28px;
+        }
+        .mode-select, .topic-input, .generate-btn {
+            margin: 0;
             border-radius: 8px;
             border: 1px solid #d0d0d0;
             font-size: 1rem;
+            outline: none;
+        }
+        .mode-select {
+            flex: 0 0 120px;
+            min-width: 100px;
+            padding: 10px 8px;
+            background: rgba(255,255,255,0.7);
         }
         .topic-input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 18px;
-            border-radius: 8px;
-            border: 1px solid #d0d0d0;
-            font-size: 1rem;
+            flex: 1 1 auto;
+            min-width: 0;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.7);
         }
         .generate-btn {
-            width: 100%;
-            padding: 14px;
-            background: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.2rem;
+            flex: 0 0 140px;
+            min-width: 110px;
+            padding: 10px 0;
+            background: linear-gradient(90deg, #8ec5fc 0%, #e0c3fc 100%);
+            color: #222;
             font-weight: 600;
+            border: none;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, color 0.2s;
+            box-shadow: 0 2px 8px #007bff22;
         }
         .generate-btn:hover {
-            background: #0056b3;
+            background: linear-gradient(90deg, #e0c3fc 0%, #8ec5fc 100%);
+            color: #007bff;
         }
         .spinner {
             display: none;
@@ -173,6 +189,52 @@
         .scoreboard-table tr:nth-child(even) {
             background: #f1f7ff;
         }
+        .review-section {
+            background: rgba(255,255,255,0.18);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px #0003;
+            padding: 32px 24px;
+            margin: 32px auto 0 auto;
+            max-width: 540px;
+            backdrop-filter: blur(10px);
+            border: 1.5px solid rgba(255,255,255,0.25);
+        }
+        .rating-card {
+            margin: 24px auto 0 auto;
+            padding: 20px 18px;
+            background: rgba(255,255,255,0.22);
+            border-radius: 14px;
+            box-shadow: 0 2px 8px #0001;
+            max-width: 340px;
+            text-align: center;
+            backdrop-filter: blur(6px);
+            border: 1px solid #e0e0e0;
+        }
+        .rating-stars {
+            font-size: 2rem;
+            color: #ffc107;
+            cursor: pointer;
+            margin: 0 2px;
+            transition: transform 0.1s;
+        }
+        .rating-stars.selected {
+            transform: scale(1.2);
+        }
+        .rating-submit {
+            margin-top: 14px;
+            padding: 8px 24px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .rating-submit:hover {
+            background: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -181,7 +243,7 @@
             <div class="icon">🧠</div>
             <h1>AI Quiz Generator</h1>
         </div>
-        <form id="quizForm">
+        <form id="quizForm" class="glass-form">
             <select id="mode" name="mode" class="mode-select">
                 <option value="easy">Easy</option>
                 <option value="moderate">Moderate</option>
@@ -202,6 +264,29 @@ let current = 0;
 let score = 0;
 let startTime = 0;
 let countdown;
+
+// --- MODE SWITCH: Existing Quiz Mode ---
+const selectedQuiz = sessionStorage.getItem('selectedQuiz');
+if (selectedQuiz) {
+    // Existing Quiz Mode
+    const quizObj = JSON.parse(selectedQuiz);
+    questions = quizObj.questions || [];
+    document.getElementById('topic').value = quizObj.topic || '';
+    document.getElementById('topic').disabled = true;
+    document.getElementById('mode').value = quizObj.mode || 'easy';
+    document.getElementById('mode').disabled = true;
+    document.querySelector('.generate-btn').style.display = 'none';
+    document.getElementById('quizForm').style.display = 'none'; // Hide form for existing quiz
+    sessionStorage.removeItem('selectedQuiz');
+    if (questions.length > 0) {
+        current = 0;
+        score = 0;
+        userAnswers = [];
+        startTime = Date.now();
+        startTimer(60);
+        showQuestion();
+    }
+}
 
 function startTimer(duration) {
     let timeLeft = duration;
@@ -328,7 +413,8 @@ function submitQuiz() {
         feedbackMessage = "😕 Don't worry. Try again!";
     }
 
-    let reviewHtml = `<div class="score"><strong>Your Score: ${score} / ${questions.length}</strong></div>
+    let reviewHtml = `<div class="review-section">
+        <div class="score"><strong>Your Score: ${score} / ${questions.length}</strong></div>
         <div class="score">${feedbackMessage}</div>
         <h3>Review Answers</h3>
         <div>`;
@@ -357,7 +443,24 @@ function submitQuiz() {
     });
     reviewHtml += `</div>
         <button id="retryBtn" style="margin-top:20px; background:#007bff; color:#fff;">Retry Quiz</button>
-        <button id="viewScoreboardBtn" style="margin-top:20px; background:#28a745;">View Scoreboard</button>`;
+        <button id="viewScoreboardBtn" style="margin-top:20px; background:#28a745;">View Scoreboard</button>
+    </div>`;
+
+    // Add rating card (default 1 star)
+    reviewHtml += `
+    <div class="rating-card">
+        <div style="font-size:1.1rem; margin-bottom:8px;">Rate this quiz topic:</div>
+        <div id="ratingStars">
+            <span class="rating-stars selected" data-value="1">&#9733;</span>
+            <span class="rating-stars" data-value="2">&#9733;</span>
+            <span class="rating-stars" data-value="3">&#9733;</span>
+            <span class="rating-stars" data-value="4">&#9733;</span>
+            <span class="rating-stars" data-value="5">&#9733;</span>
+        </div>
+        <button class="rating-submit" id="submitRatingBtn">Submit Rating</button>
+        <div id="ratingMsg" style="margin-top:8px; color:#28a745;"></div>
+    </div>
+    `;
 
     document.getElementById('quiz').innerHTML = reviewHtml;
 
@@ -375,6 +478,25 @@ function submitQuiz() {
         showQuestion();
     };
     document.getElementById('viewScoreboardBtn').onclick = showScoreboard;
+
+    // --- Rating logic ---
+    let selectedRating = 1;
+    const stars = document.querySelectorAll('.rating-stars');
+    stars.forEach((star, idx) => {
+        star.onclick = function() {
+            selectedRating = idx + 1;
+            stars.forEach((s, i) => {
+                s.classList.toggle('selected', i < selectedRating);
+            });
+        };
+    });
+    document.getElementById('submitRatingBtn').onclick = function() {
+        document.getElementById('ratingMsg').textContent = `Thank you for rating: ${selectedRating} star${selectedRating > 1 ? 's' : ''}!`;
+        document.getElementById('submitRatingBtn').disabled = true;
+        setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 1200);
+    };
 }
 
 async function showScoreboard() {

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QuizApp Dashboard</title>
+    <style>
+        body {
+            background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 700px;
+            margin: 60px auto;
+            background: rgba(255,255,255,0.18);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px #0003;
+            padding: 40px 32px 32px 32px;
+            backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(255,255,255,0.25);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: #222;
+            letter-spacing: 1px;
+        }
+        .search-bar {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 24px;
+            border-radius: 10px;
+            border: 1px solid #d0d0d0;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background: rgba(255,255,255,0.7);
+        }
+        .plus-dialog {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+        .plus-btn {
+            background: rgba(255,255,255,0.7);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px #0002;
+            padding: 28px 36px;
+            border: none;
+            cursor: pointer;
+            transition: box-shadow 0.2s, background 0.2s;
+            font-size: 2.5rem;
+            color: #007bff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .plus-btn:hover {
+            box-shadow: 0 8px 32px #007bff33;
+            background: #e3f0ff;
+        }
+        .plus-label {
+            font-size: 1.1rem;
+            color: #007bff;
+            margin-left: 18px;
+            font-weight: 500;
+        }
+        .quiz-list {
+            margin-top: 10px;
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        .quiz-card {
+            min-width: 170px;
+            max-width: 200px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 14px;
+            box-shadow: 0 2px 8px #0001;
+            padding: 18px 14px 14px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 8px;
+        }
+        .quiz-card:hover {
+            background: #e3f0ff;
+            box-shadow: 0 4px 16px #007bff22;
+            transform: translateY(-2px) scale(1.03);
+        }
+        .quiz-title {
+            font-size: 1.08rem;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+        .quiz-rating {
+            margin-top: 2px;
+            color: #ffc107;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+        .empty-list {
+            text-align: center;
+            color: #888;
+            margin-top: 24px;
+            width: 100%;
+        }
+        @media (max-width: 700px) {
+            .container { max-width: 98vw; padding: 18px 4vw 18px 4vw; }
+            .quiz-list { gap: 10px; }
+            .quiz-card { min-width: 140px; max-width: 170px; padding: 12px 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>QuizApp</h1>
+        </div>
+        <input class="search-bar" id="searchBar" type="text" placeholder="Search for a quiz topic...">
+        <div class="plus-dialog">
+            <button class="plus-btn" id="newQuizBtn" title="Try AI Generated Quiz">
+                <span>+</span>
+                <span class="plus-label">New AI Quiz</span>
+            </button>
+        </div>
+        <div class="quiz-list" id="quizList">
+            <div class="empty-list">Loading quizzes...</div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('newQuizBtn').onclick = function() {
+            window.location.href = '/quiz';
+        };
+
+        async function fetchQuizzes() {
+            const res = await fetch('/fetch_quizzes');
+            const quizzes = await res.json();
+            return quizzes;
+        }
+
+        // Render quizzes as compact cards with stars
+        function renderQuizzes(quizzes) {
+            const quizList = document.getElementById('quizList');
+            quizList.innerHTML = '';
+            if (!quizzes.length) {
+                quizList.innerHTML = '<div class="empty-list">No quizzes found.</div>';
+                return;
+            }
+            quizzes.forEach((quiz, idx) => {
+                const card = document.createElement('div');
+                card.className = 'quiz-card';
+                // Use quiz.rating if available, else random for demo
+                const rating = quiz.rating ?? (Math.floor(Math.random() * 3) + 3);
+                card.innerHTML = `
+                    <span class="quiz-title" title="${quiz.topic || 'Untitled Quiz'}">${quiz.topic || 'Untitled Quiz'}</span>
+                    <span class="quiz-rating">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span>
+                `;
+                card.onclick = () => {
+                    sessionStorage.setItem('selectedQuiz', JSON.stringify(quiz));
+                    window.location.href = '/quiz';
+                };
+                quizList.appendChild(card);
+            });
+        }
+
+        document.getElementById('searchBar').addEventListener('input', async function() {
+            const search = this.value.toLowerCase();
+            const quizzes = await fetchQuizzes();
+            const filtered = quizzes.filter(q => (q.topic || '').toLowerCase().includes(search));
+            renderQuizzes(filtered);
+        });
+
+        fetchQuizzes().then(renderQuizzes);
+    </script>
+</body>
+</html>

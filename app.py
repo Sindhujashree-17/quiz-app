@@ -3,9 +3,10 @@ import google.generativeai as genai
 import json
 import re
 import os
+from firebase_utils import save_quiz, get_all_quizzes, get_quiz_by_id, save_rating
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Add this line for session support
+app.secret_key = '24'  # Add this line for session support
 
 # ✅ Gemini API Key
 genai.configure(api_key="AIzaSyBvA3DLZVADphQrPM5_ZTkaJqAdVXfG6M4")# Or replace with "your-api-key"
@@ -14,7 +15,20 @@ genai.configure(api_key="AIzaSyBvA3DLZVADphQrPM5_ZTkaJqAdVXfG6M4")# Or replace w
 scoreboard = []
 
 @app.route('/')
-def home():
+def root():
+    # Redirect to login or dashboard depending on session
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return redirect(url_for('dashboard'))
+
+@app.route('/dashboard')
+def dashboard():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return render_template('dashboard.html')
+
+@app.route('/quiz')
+def quiz():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     return render_template('index.html')
@@ -52,6 +66,14 @@ def generate():
             match = re.search(r'\[\s*{.*?}\s*]', response_text, re.DOTALL)
             questions = json.loads(match.group()) if match else []
 
+        # Save the generated quiz to Firestore
+        quiz_data = {
+            'topic': topic,
+            'mode': mode,
+            'questions': questions
+        }
+        save_quiz(quiz_data)
+
         return jsonify(questions)
     except Exception as e:
         print("❌ Error:", e)
@@ -72,9 +94,10 @@ def submit():
     })
     return jsonify({'status': 'success'})
 
-@app.route('/scoreboard')
-def get_scoreboard():
-    return jsonify(scoreboard)
+@app.route('/fetch_quizzes')
+def fetch_quizzes():
+    quizzes = get_all_quizzes()
+    return jsonify(quizzes)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -83,7 +106,7 @@ def login():
         password = request.form.get('password')
         if username == 'admin' and password == 'admin':
             session['logged_in'] = True
-            return redirect(url_for('home'))  # Redirect to quiz page
+            return redirect(url_for('dashboard'))
         else:
             error = "Invalid username or password"
             return render_template('login.html', error=error)
@@ -91,8 +114,16 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop('logged_in', None)
+    session.clear()
     return redirect(url_for('login'))
+
+@app.route('/rate_quiz', methods=['POST'])
+def rate_quiz():
+    data = request.get_json()
+    quiz_id = data.get('quiz_id')
+    rating = data.get('rating')
+    save_rating(quiz_id, rating)
+    return jsonify({'status': 'success'})
 
 if __name__ == '__main__':
     app.run(debug=True)
