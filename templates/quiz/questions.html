@@ -1,0 +1,78 @@
+{% extends "quiz/layout.html" %}
+
+{% block content %}
+<h2>{{ quiz.topic or 'Quiz' }}</h2>
+
+<form method="post" action="/quiz/submit">
+    <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+
+    {% for q in questions %}
+    <div class="question-card">
+        <div class="question">{{ loop.index }}. {{ q.question }}</div>
+        {% for opt in q.options %}
+        <label class="option">
+            <input type="radio" name="q{{ loop.parent.index0 }}" value="{{ opt }}" required>
+            {{ opt }}
+        </label>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="submit-btn">Submit Quiz</button>
+</form>
+
+<a class="back-link" href="/dashboard">← Back to Dashboard</a>
+{% endblock %}
+
+{% block head_extra %}
+<style>
+    .question-card {
+        background: rgba(255,255,255,0.8);
+        border-radius: 16px;
+        box-shadow: 0 4px 16px #0002;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .question {
+        font-weight: 600;
+        margin-bottom: 16px;
+        color: #222;
+    }
+
+    .option {
+        margin-bottom: 12px;
+    }
+
+    .option input {
+        margin-right: 8px;
+    }
+
+    .submit-btn {
+        background-color: #007bff;
+        color: white;
+        padding: 14px 22px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 12px #007bff66;
+        transition: background 0.2s, box-shadow 0.2s;
+        margin-top: 12px;
+    }
+
+    .submit-btn:hover {
+        background-color: #0056b3;
+        box-shadow: 0 6px 20px #007bff88;
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 24px;
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}

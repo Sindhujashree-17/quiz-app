@@ -1,0 +1,64 @@
+{% extends "quiz/layout.html" %}
+
+{% block content %}
+<form method="post" action="/quiz/start">
+    <div class="horizontal-form">
+        <input type="text" name="topic" required placeholder="e.g., Python, Math, etc.">
+        <select name="mode" required>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <button type="submit" class="submit-btn small-btn">Generate</button>
+    </div>
+</form>
+<a class="back-link" href="/dashboard">← Back to Dashboard</a>
+{% endblock %}
+
+{% block head_extra %}
+<style>
+    .horizontal-form {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .horizontal-form input[name="topic"] {
+        flex: 2;
+        min-width: 200px;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+    }
+
+    .horizontal-form select[name="mode"] {
+        flex: 1;
+        min-width: 120px;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+    }
+
+    .small-btn {
+        padding: 10px 18px;
+        font-size: 1rem;
+        border-radius: 8px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 24px;
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}

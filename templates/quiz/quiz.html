@@ -1,0 +1,11 @@
+{% block content %}
+    {% if show_form %}
+        {% include "quiz/form.html" %}
+    {% endif %}
+    
+    {% if show_questions %}
+        {% include "quiz/questions.html" %}
+    {% endif %}
+    
+    {% include "quiz/back_link.html" %}
+{% endblock %}

@@ -13,14 +13,14 @@
             min-height: 100vh;
         }
         .container {
-            max-width: 700px;
+            max-width: 720px;
             margin: 60px auto;
-            background: rgba(255,255,255,0.18);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px #0003;
-            padding: 40px 32px 32px 32px;
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(12px);
-            border: 1.5px solid rgba(255,255,255,0.25);
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            padding: 40px 32px;
         }
         .header {
             text-align: center;
@@ -28,167 +28,138 @@
         }
         .header h1 {
             font-size: 2.5rem;
-            font-weight: 700;
-            margin: 0;
             color: #222;
-            letter-spacing: 1px;
+            margin: 0;
         }
         .search-bar {
             width: 100%;
             padding: 12px;
             margin-bottom: 24px;
             border-radius: 10px;
-            border: 1px solid #d0d0d0;
+            border: 1px solid #ccc;
             font-size: 1rem;
-            box-sizing: border-box;
-            background: rgba(255,255,255,0.7);
+            background: rgba(255,255,255,0.85);
         }
         .plus-dialog {
             display: flex;
             justify-content: center;
-            align-items: center;
             margin-bottom: 32px;
         }
         .plus-btn {
-            background: rgba(255,255,255,0.7);
-            border-radius: 16px;
-            box-shadow: 0 4px 16px #0002;
-            padding: 28px 36px;
+            background: rgba(255, 255, 255, 0.9);
             border: none;
-            cursor: pointer;
-            transition: box-shadow 0.2s, background 0.2s;
+            border-radius: 16px;
+            padding: 24px 36px;
             font-size: 2.5rem;
             color: #007bff;
             display: flex;
             align-items: center;
-            justify-content: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s, box-shadow 0.3s;
+            cursor: pointer;
         }
         .plus-btn:hover {
-            box-shadow: 0 8px 32px #007bff33;
             background: #e3f0ff;
+            box-shadow: 0 8px 24px rgba(0, 123, 255, 0.3);
         }
         .plus-label {
-            font-size: 1.1rem;
-            color: #007bff;
-            margin-left: 18px;
+            margin-left: 16px;
+            font-size: 1.2rem;
             font-weight: 500;
         }
         .quiz-list {
-            margin-top: 10px;
             display: flex;
-            gap: 18px;
+            gap: 16px;
             overflow-x: auto;
             padding-bottom: 10px;
         }
         .quiz-card {
-            min-width: 170px;
+            min-width: 160px;
             max-width: 200px;
-            background: rgba(255,255,255,0.7);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 14px;
-            box-shadow: 0 2px 8px #0001;
-            padding: 18px 14px 14px 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            cursor: pointer;
-            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-            border: 1px solid #e0e0e0;
-            margin-bottom: 8px;
+            border: 1px solid #ddd;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         .quiz-card:hover {
-            background: #e3f0ff;
-            box-shadow: 0 4px 16px #007bff22;
-            transform: translateY(-2px) scale(1.03);
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
         }
         .quiz-title {
-            font-size: 1.08rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #222;
             margin-bottom: 8px;
-            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            width: 100%;
+            white-space: nowrap;
         }
         .quiz-rating {
-            margin-top: 2px;
-            color: #ffc107;
             font-size: 1.1rem;
+            color: #ffc107;
             letter-spacing: 1px;
         }
-        .empty-list {
+        .empty-message {
             text-align: center;
-            color: #888;
-            margin-top: 24px;
-            width: 100%;
+            color: #777;
+            font-size: 1rem;
+            padding: 20px;
         }
-        @media (max-width: 700px) {
-            .container { max-width: 98vw; padding: 18px 4vw 18px 4vw; }
-            .quiz-list { gap: 10px; }
-            .quiz-card { min-width: 140px; max-width: 170px; padding: 12px 8px; }
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+            .quiz-card {
+                min-width: 140px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>QuizApp</h1>
-        </div>
-        <input class="search-bar" id="searchBar" type="text" placeholder="Search for a quiz topic...">
-        <div class="plus-dialog">
-            <button class="plus-btn" id="newQuizBtn" title="Try AI Generated Quiz">
-                <span>+</span>
+<div class="container">
+    <div class="header">
+        <h1>QuizApp</h1>
+    </div>
+
+    <!-- Search Bar -->
+    <form method="get" action="/dashboard">
+        <input class="search-bar" type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="Search quizzes...">
+    </form>
+
+    <!-- New Quiz Button -->
+    <div class="plus-dialog">
+        <form method="get" action="/quiz/start">
+            <button class="plus-btn" title="Generate a new quiz">
+                +
                 <span class="plus-label">New AI Quiz</span>
             </button>
-        </div>
-        <div class="quiz-list" id="quizList">
-            <div class="empty-list">Loading quizzes...</div>
-        </div>
+        </form>
     </div>
-    <script>
-        document.getElementById('newQuizBtn').onclick = function() {
-            window.location.href = '/quiz';
-        };
 
-        async function fetchQuizzes() {
-            const res = await fetch('/fetch_quizzes');
-            const quizzes = await res.json();
-            return quizzes;
-        }
-
-        // Render quizzes as compact cards with stars
-        function renderQuizzes(quizzes) {
-            const quizList = document.getElementById('quizList');
-            quizList.innerHTML = '';
-            if (!quizzes.length) {
-                quizList.innerHTML = '<div class="empty-list">No quizzes found.</div>';
-                return;
-            }
-            quizzes.forEach((quiz, idx) => {
-                const card = document.createElement('div');
-                card.className = 'quiz-card';
-                // Use quiz.rating if available, else random for demo
-                const rating = quiz.rating ?? (Math.floor(Math.random() * 3) + 3);
-                card.innerHTML = `
-                    <span class="quiz-title" title="${quiz.topic || 'Untitled Quiz'}">${quiz.topic || 'Untitled Quiz'}</span>
-                    <span class="quiz-rating">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span>
-                `;
-                card.onclick = () => {
-                    sessionStorage.setItem('selectedQuiz', JSON.stringify(quiz));
-                    window.location.href = '/quiz';
-                };
-                quizList.appendChild(card);
-            });
-        }
-
-        document.getElementById('searchBar').addEventListener('input', async function() {
-            const search = this.value.toLowerCase();
-            const quizzes = await fetchQuizzes();
-            const filtered = quizzes.filter(q => (q.topic || '').toLowerCase().includes(search));
-            renderQuizzes(filtered);
-        });
-
-        fetchQuizzes().then(renderQuizzes);
-    </script>
+    <!-- Quiz List -->
+    <div class="quiz-list">
+        {% if quizzes %}
+            {% for quiz in quizzes %}
+                <form method="post" action="/quiz/start">
+                    <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+                    <button type="submit" class="quiz-card" title="Take '{{ quiz.topic }}' quiz">
+                        <div class="quiz-title">{{ quiz.topic or "Untitled" }}</div>
+                        <div class="quiz-rating">
+                            {% set rating = quiz.rating or 4 %}
+                            {{ "★" * rating }}{{ "☆" * (5 - rating) }}
+                        </div>
+                    </button>
+                </form>
+            {% endfor %}
+        {% else %}
+            <div class="empty-message">No quizzes found yet. Try creating one!</div>
+        {% endif %}
+    </div>
+</div>
 </body>
 </html>

@@ -2,49 +2,104 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login | Quiz App</title>
+    <title>QuizApp Login</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f7f7fa; }
+        body {
+            background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
         .login-container {
-            max-width: 350px;
-            margin: 80px auto;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px #0001;
-            padding: 32px 24px;
+            max-width: 400px;
+            margin: 100px auto;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px #0003;
+            padding: 40px 30px;
+            backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(255,255,255,0.2);
         }
-        h2 { text-align: center; margin-bottom: 24px; }
-        input[type="text"], input[type="password"] {
-            width: 100%; padding: 10px; margin-bottom: 16px;
-            border-radius: 5px; border: 1px solid #ccc;
+        .login-header {
+            text-align: center;
+            margin-bottom: 28px;
         }
-        button {
-            width: 100%; padding: 10px; border-radius: 5px;
-            border: none; background: #007bff; color: #fff;
-            font-size: 16px; cursor: pointer;
+        .login-header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #222;
         }
-        .forgot {
-            display: block; text-align: right; margin-top: 8px;
-            color: #007bff; text-decoration: none; font-size: 14px;
+        .form-group {
+            margin-bottom: 18px;
         }
-        .forgot:hover { text-decoration: underline; }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #333;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.75);
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            box-shadow: 0 4px 12px #007bff44;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+            box-shadow: 0 6px 20px #007bff66;
+        }
+        .error-message {
+            color: #d33;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.95rem;
+        }
+        @media (max-width: 500px) {
+            .login-container {
+                margin: 60px 4vw;
+                padding: 30px 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- 
-        Login Page Instructions:
-        - Enter your username and password.
-        - Click "Login" to access the quiz app.
-        - Use 'admin' for both username and password for demo login.
-        - Click "Forgot password?" if you need help (demo only).
-    -->
     <div class="login-container">
-        <h2>Login</h2>
-        <form method="POST" action="/login">
-            <input type="text" name="username" placeholder="Username" required />
-            <input type="password" name="password" placeholder="Password" required />
-            <button type="submit">Login</button>
-            <a href="#" class="forgot">Forgot password?</a>
+        <div class="login-header">
+            <h1>QuizApp Login</h1>
+        </div>
+        <form action="/login" method="post">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+            <input type="submit" value="Login">
+            {% if error %}
+                <div class="error-message">{{ error }}</div>
+            {% endif %}
         </form>
     </div>
 </body>

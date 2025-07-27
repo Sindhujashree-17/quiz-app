@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ quiz.topic or 'Quiz' }} - QuizApp</title>
+    <style>
+        body {
+            background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 720px;
+            margin: 60px auto;
+            background: rgba(255,255,255,0.18);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px #0003;
+            padding: 36px 30px;
+            backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(255,255,255,0.25);
+        }
+        h2 {
+            text-align: center;
+            color: #222;
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+        .quiz-meta {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .quiz-meta span {
+            display: block;
+            font-size: 1rem;
+            color: #444;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        .submit-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 14px 22px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px #007bff66;
+            transition: background 0.2s, box-shadow 0.2s;
+            margin-top: 12px;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+            box-shadow: 0 6px 20px #007bff88;
+        }
+    </style>
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <h2>{{ quiz.topic or 'Quiz' }}</h2>
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
