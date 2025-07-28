@@ -8,6 +8,22 @@ if not firebase_admin._apps:
 
 db = firestore.client()
 
+def save_user(username, password):
+    """Save a new user to Firestore."""
+    users_ref = db.collection('users')
+    users_ref.add({
+        'username': username,
+        'password': password
+    })
+
+def get_user(username):
+    """Retrieve a user by username from Firestore."""
+    users_ref = db.collection('users')
+    query = users_ref.where('username', '==', username).limit(1).stream()
+    for doc in query:
+        return doc.to_dict()
+    return None
+
 def save_quiz(quiz_data):
     """Save a quiz to Firestore."""
     quizzes_ref = db.collection('quizzes')

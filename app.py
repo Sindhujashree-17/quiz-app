@@ -3,7 +3,7 @@ import google.generativeai as genai
 import json
 import re
 import os
-from firebase_utils import save_quiz, get_all_quizzes, get_quiz_by_id, save_rating
+from firebase_utils import save_quiz, get_all_quizzes, get_quiz_by_id, save_rating, save_user, get_user
 
 app = Flask(__name__)
 app.secret_key = '24'  # Add this line for session support
@@ -20,6 +20,19 @@ def root():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     return redirect(url_for('dashboard'))
+
+@app.route('/signup')
+def signup():
+    return render_template('signup.html')
+
+@app.route("/register", methods=["POST"])
+def register():
+    username = request.form.get("username")
+    password = request.form.get("password")
+    save_user(username, password)
+    return redirect(url_for('login'))
+
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -104,7 +117,7 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        if username == 'admin' and password == 'admin':
+        if get_user(username) and get_user(username)['password'] == password:
             session['logged_in'] = True
             return redirect(url_for('dashboard'))
         else:
@@ -112,10 +125,11 @@ def login():
             return render_template('login.html', error=error)
     return render_template('login.html')
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
 
 @app.route('/rate_quiz', methods=['POST'])
 def rate_quiz():

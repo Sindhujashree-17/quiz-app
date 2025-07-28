@@ -4,47 +4,101 @@
     <meta charset="UTF-8">
     <title>Login | Quiz App</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f7f7fa; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to bottom right, rgba(0, 0, 0, 0.3), rgba(50, 50, 100, 0.4)),
+                        url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+            background-size: cover;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
         .login-container {
-            max-width: 350px;
-            margin: 80px auto;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px #0001;
-            padding: 32px 24px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        h2 { text-align: center; margin-bottom: 24px; }
-        input[type="text"], input[type="password"] {
-            width: 100%; padding: 10px; margin-bottom: 16px;
-            border-radius: 5px; border: 1px solid #ccc;
+
+        h2 {
+            text-align: center;
+            margin-bottom: 28px;
+            font-size: 26px;
+            color: #fff;
         }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+        }
+
+        input::placeholder {
+            color: #eee;
+        }
+
         button {
-            width: 100%; padding: 10px; border-radius: 5px;
-            border: none; background: #007bff; color: #fff;
-            font-size: 16px; cursor: pointer;
+            width: 100%;
+            padding: 12px;
+            background: #4a63f7;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
         }
+
+        button:hover {
+            background: #3749d7;
+        }
+
         .forgot {
-            display: block; text-align: right; margin-top: 8px;
-            color: #007bff; text-decoration: none; font-size: 14px;
+            display: block;
+            margin-top: 12px;
+            text-align: right;
+            font-size: 14px;
+            color: #ffffffcc;
+            text-decoration: none;
         }
-        .forgot:hover { text-decoration: underline; }
+
+        .forgot:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-    <!-- 
-        Login Page Instructions:
-        - Enter your username and password.
-        - Click "Login" to access the quiz app.
-        - Use 'admin' for both username and password for demo login.
-        - Click "Forgot password?" if you need help (demo only).
-    -->
     <div class="login-container">
-        <h2>Login</h2>
+        <h2>Login to QuizApp</h2>
         <form method="POST" action="/login">
             <input type="text" name="username" placeholder="Username" required />
             <input type="password" name="password" placeholder="Password" required />
             <button type="submit">Login</button>
-            <a href="#" class="forgot">Forgot password?</a>
+            <a href="/signup" class="forgot">Don't have an account? Sign up</a>
+            {% if error %}
+                <p style="color: red; text-align: center;">{{ error }}</p>
+            {% endif %}
+            <a href="/forgot-password" class="forgot">Forgot password?</a>
         </form>
     </div>
 </body>

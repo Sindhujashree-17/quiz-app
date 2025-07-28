@@ -281,12 +281,13 @@ if (selectedQuiz) {
     if (questions.length > 0) {
         current = 0;
         score = 0;
-        userAnswers = [];
+        userAnswers = Array(questions.length).fill(null); // <-- 🔑 FIX: ensure answer slots!
         startTime = Date.now();
         startTimer(60);
         showQuestion();
     }
 }
+
 
 function startTimer(duration) {
     let timeLeft = duration;
@@ -332,67 +333,141 @@ document.getElementById('quizForm').addEventListener('submit', async function(e)
     score = 0;
     startTime = Date.now();
     startTimer(60);
+    userAnswers = Array(questions.length).fill(null);
     showQuestion();
 });
 
+// function showQuestion() {
+//     const q = questions[current];
+//     let html = `<div class="question">
+//         <h3>Q${current + 1}: ${q.question}</h3>
+//         <form id="answerForm">
+//             ${q.options.map((opt, i) => `
+//                 <label class="option-label">
+//                     <input type="radio" name="answer" value="${opt}" ${userAnswers[current] === opt ? 'checked' : ''}>
+//                     ${opt}
+//                 </label>
+//             `).join('')}
+//             <div style="margin-top:16px;">
+//                 ${current > 0 ? '<button type="button" id="prevBtn" class="btn btn-secondary">Previous</button>' : ''}
+//                 ${current < questions.length - 1 ? '<button type="button" id="nextBtn" class="btn btn-primary" disabled>Next</button>' : '<button type="submit" class="btn btn-success" disabled>Submit</button>'}
+//             </div>
+//         </form>
+//     </div>`;
+//     document.getElementById('quiz').innerHTML = html;
+
+//     // Enable Next/Submit only when an answer is selected
+//     const answerInputs = document.querySelectorAll('input[name="answer"]');
+//     const nextBtn = document.getElementById('nextBtn');
+//     const submitBtn = document.querySelector('button[type="submit"]');
+
+//     answerInputs.forEach(input => {
+//         input.addEventListener('change', () => {
+//             if (nextBtn) nextBtn.disabled = false;
+//             if (submitBtn) submitBtn.disabled = false;
+//         });
+//     });
+
+//     if (current > 0) {
+//         document.getElementById('prevBtn').onclick = function() {
+//             const selected = document.querySelector('input[name="answer"]:checked');
+//             userAnswers[current] = selected ? selected.value : null;
+//             current--;
+//             showQuestion();
+//         };
+//     }
+//     if (current < questions.length - 1) {
+//         if (nextBtn) {
+//             nextBtn.onclick = function() {
+//                 const selected = document.querySelector('input[name="answer"]:checked');
+//                 userAnswers[current] = selected ? selected.value : null;
+//                 current++;
+//                 showQuestion();
+//             };
+//         }
+//     } else if (submitBtn) {
+//         document.getElementById('answerForm').onsubmit = function(e) {
+//             e.preventDefault();
+//             const selected = document.querySelector('input[name="answer"]:checked');
+//             userAnswers[current] = selected ? selected.value : null;
+//             clearInterval(countdown);
+//             submitQuiz();
+//         };
+//     }
+// }
+
 function showQuestion() {
     const q = questions[current];
-    let html = `<div class="question">
+    // Ensure userAnswers has blank slots for every question
+    if (userAnswers.length !== questions.length) userAnswers = Array(questions.length).fill(null);
+
+    let html = `
+      <div class="question">
         <h3>Q${current + 1}: ${q.question}</h3>
         <form id="answerForm">
-            ${q.options.map((opt, i) => `
-                <label class="option-label">
-                    <input type="radio" name="answer" value="${opt}" ${userAnswers[current] === opt ? 'checked' : ''}>
-                    ${opt}
-                </label>
-            `).join('')}
-            <div style="margin-top:16px;">
-                ${current > 0 ? '<button type="button" id="prevBtn" class="btn btn-secondary">Previous</button>' : ''}
-                ${current < questions.length - 1 ? '<button type="button" id="nextBtn" class="btn btn-primary" disabled>Next</button>' : '<button type="submit" class="btn btn-success" disabled>Submit</button>'}
-            </div>
+          ${q.options.map((opt, i) => `
+              <label class="option-label">
+                <input type="radio" name="answer" value="${opt}" ${userAnswers[current] === opt ? 'checked' : ''} required>
+                ${opt}
+              </label>
+          `).join('')}
+          <div style="margin-top:16px;">
+            ${current > 0 ? '<button type="button" id="prevBtn" class="btn btn-secondary">Previous</button>' : ''}
+            ${current < questions.length - 1 
+                ? `<button type="button" id="nextBtn" class="btn btn-primary"${userAnswers[current] ? '' : ' disabled'}>Next</button>`
+                : `<button type="submit" class="btn btn-success"${userAnswers[current] ? '' : ' disabled'}>Submit</button>`}
+          </div>
         </form>
-    </div>`;
+      </div>
+    `;
     document.getElementById('quiz').innerHTML = html;
 
-    // Enable Next/Submit only when an answer is selected
-    const answerInputs = document.querySelectorAll('input[name="answer"]');
+    const form = document.getElementById("answerForm");
+    const radios = form.querySelectorAll('input[name="answer"]');
     const nextBtn = document.getElementById('nextBtn');
-    const submitBtn = document.querySelector('button[type="submit"]');
+    const prevBtn = document.getElementById('prevBtn');
+    const submitBtn = form.querySelector('button[type="submit"]');
 
-    answerInputs.forEach(input => {
-        input.addEventListener('change', () => {
+    // Enable nav when any answer is selected
+    radios.forEach(r => {
+        r.addEventListener('change', function() {
+            userAnswers[current] = this.value;
             if (nextBtn) nextBtn.disabled = false;
             if (submitBtn) submitBtn.disabled = false;
         });
     });
 
-    if (current > 0) {
-        document.getElementById('prevBtn').onclick = function() {
-            const selected = document.querySelector('input[name="answer"]:checked');
+    // Save and go to previous question
+    if (prevBtn) {
+        prevBtn.onclick = function() {
+            // Save answer if changed
+            const selected = form.querySelector('input[name="answer"]:checked');
             userAnswers[current] = selected ? selected.value : null;
             current--;
             showQuestion();
         };
     }
-    if (current < questions.length - 1) {
-        if (nextBtn) {
-            nextBtn.onclick = function() {
-                const selected = document.querySelector('input[name="answer"]:checked');
-                userAnswers[current] = selected ? selected.value : null;
-                current++;
-                showQuestion();
-            };
-        }
-    } else if (submitBtn) {
-        document.getElementById('answerForm').onsubmit = function(e) {
+    // Save and go to next question
+    if (nextBtn) {
+        nextBtn.onclick = function() {
+            const selected = form.querySelector('input[name="answer"]:checked');
+            userAnswers[current] = selected ? selected.value : null;
+            current++;
+            showQuestion();
+        };
+    }
+    // On submit, save answer and finish quiz
+    if (submitBtn) {
+        form.onsubmit = function(e) {
             e.preventDefault();
-            const selected = document.querySelector('input[name="answer"]:checked');
+            const selected = form.querySelector('input[name="answer"]:checked');
             userAnswers[current] = selected ? selected.value : null;
             clearInterval(countdown);
             submitQuiz();
         };
     }
 }
+
 
 function submitQuiz() {
     score = 0;
@@ -479,25 +554,45 @@ function submitQuiz() {
     };
     document.getElementById('viewScoreboardBtn').onclick = showScoreboard;
 
+        
     // --- Rating logic ---
     let selectedRating = 1;
     const stars = document.querySelectorAll('.rating-stars');
+    const ratingMsg = document.getElementById('ratingMsg');
+    const ratingBtn = document.getElementById('submitRatingBtn');
+
+    function updateStars(n) {
+        stars.forEach((star, i) => {
+            star.classList.toggle('selected', i < n);
+        });
+    }
+    updateStars(selectedRating);
+
+    // Click to rate, hover for instant feedback
     stars.forEach((star, idx) => {
         star.onclick = function() {
             selectedRating = idx + 1;
-            stars.forEach((s, i) => {
-                s.classList.toggle('selected', i < selectedRating);
-            });
+            updateStars(selectedRating);
+        };
+        star.onmouseenter = function() {
+            updateStars(idx + 1);
+        };
+        star.onmouseleave = function() {
+            updateStars(selectedRating);
         };
     });
-    document.getElementById('submitRatingBtn').onclick = function() {
-        document.getElementById('ratingMsg').textContent = `Thank you for rating: ${selectedRating} star${selectedRating > 1 ? 's' : ''}!`;
-        document.getElementById('submitRatingBtn').disabled = true;
+
+    ratingBtn.onclick = function() {
+        ratingBtn.disabled = true;
+        ratingMsg.textContent = `Thank you for rating: ${selectedRating} star${selectedRating > 1 ? 's' : ''}!`;
         setTimeout(() => {
             window.location.href = '/dashboard';
         }, 1200);
     };
+
 }
+
+
 
 async function showScoreboard() {
     const res = await fetch('/scoreboard');
